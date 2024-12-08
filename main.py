@@ -1,6 +1,5 @@
 import sys
-from PyQt6 import uic
-from PyQt6.QtWidgets import QMainWindow, QApplication, QInputDialog
+from PyQt6.QtWidgets import QMainWindow, QApplication, QInputDialog, QPushButton, QTextBrowser
 import sqlite3
 
 a = {"Капучино": 1, "Эспрессо": 2, "Американо": 3, "Латте": 4}
@@ -12,16 +11,50 @@ add_val_l = []
 
 class Coffee(QMainWindow):
     def __init__(self):
-        super(Coffee, self).__init__()
-        uic.loadUi('main.ui', self)
-        self.latte.clicked.connect(self.latte_f)
-        self.ecsp.clicked.connect(self.ecsp_f)
-        self.americ.clicked.connect(self.americ_f)
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setGeometry(800, 600, 800, 600)
+        self.setWindowTitle('кофе')
+
+        self.cap = QPushButton(self)
+        self.cap.move(0, 0)
+        self.cap.resize(387, 32)
+        self.cap.setText("Капучино")
         self.cap.clicked.connect(self.cap_f)
+
+        self.americ = QPushButton(self)
+        self.americ.move(389, 0)
+        self.americ.resize(387, 32)
+        self.americ.setText("Американо")
+        self.americ.clicked.connect(self.americ_f)
+
+        self.ecsp = QPushButton(self)
+        self.ecsp.move(0, 34)
+        self.ecsp.resize(387, 32)
+        self.ecsp.setText("Эспрессо")
+        self.ecsp.clicked.connect(self.ecsp_f)
+
+        self.latte = QPushButton(self)
+        self.latte.move(389, 34)
+        self.latte.resize(387, 32)
+        self.latte.setText("Латте")
+        self.latte.clicked.connect(self.latte_f)
+
+        self.changes = QPushButton(self)
+        self.changes.move(0, 68)
+        self.changes.resize(387, 32)
+        self.changes.setText("больше возможностей")
         self.changes.clicked.connect(self.new_form)
 
+        self.textB = QTextBrowser(self)
+        self.textB.move(12, 122)
+        self.textB.resize(776, 445)
+        self.show()
+
     def latte_f(self):
-        con = sqlite3.connect("coffee.sqlite")
+        con = sqlite3.connect("data/coffee.sqlite")
         cur = con.cursor()
         result = cur.execute("""SELECT * FROM coffee
             WHERE id = 4""")
@@ -38,7 +71,7 @@ class Coffee(QMainWindow):
         cur.close()
 
     def ecsp_f(self):
-        con = sqlite3.connect("coffee.sqlite")
+        con = sqlite3.connect("data/coffee.sqlite")
         cur = con.cursor()
         result = cur.execute("""SELECT * FROM coffee
                     WHERE id = 2""")
@@ -56,7 +89,7 @@ class Coffee(QMainWindow):
         cur.close()
 
     def americ_f(self):
-        con = sqlite3.connect("coffee.sqlite")
+        con = sqlite3.connect("data/coffee.sqlite")
         cur = con.cursor()
         result = cur.execute("""SELECT * FROM coffee
                     WHERE id = 3""")
@@ -73,7 +106,7 @@ class Coffee(QMainWindow):
         cur.close()
 
     def cap_f(self):
-        con = sqlite3.connect("coffee.sqlite")
+        con = sqlite3.connect("data/coffee.sqlite")
         cur = con.cursor()
         result = cur.execute("""SELECT * FROM coffee
                     WHERE id = 1""")
@@ -97,10 +130,25 @@ class Coffee(QMainWindow):
 
 class Changes(QMainWindow):
     def __init__(self):
-        super(Changes, self).__init__()
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setGeometry(311, 238, 311, 238)
+        self.setWindowTitle('изминить кофе')
+
+        self.add = QPushButton(self)
+        self.add.move(6, 54)
+        self.add.resize(299, 32)
+        self.add.setText("добавить запись о кофе")
         self.add.clicked.connect(self.add_v)
+
+        self.change = QPushButton(self)
+        self.change.move(6, 134)
+        self.change.resize(299, 32)
+        self.change.setText("изминить запись о кофе")
         self.change.clicked.connect(self.change_v)
+        self.show()
 
     def add_v(self):
         cofe, ok_pressed = QInputDialog.getItem(
@@ -109,7 +157,7 @@ class Changes(QMainWindow):
         if ok_pressed:
             name, ok_pressed = QInputDialog.getText(self, "Введите новую запись о кофе", "Новая запись")
             if ok_pressed:
-                con = sqlite3.connect("coffee.sqlite")
+                con = sqlite3.connect("data/coffee.sqlite")
                 cur = con.cursor()
                 result = cur.execute(f"UPDATE coffee SET новые = ? WHERE id = ?", (name, a[cofe]))
                 con.commit()
@@ -152,7 +200,7 @@ class Changes(QMainWindow):
         if ok_pressed:
             name, ok_pressed = QInputDialog.getText(self, "Введите новое значение", "Новое значение")
             if ok_pressed:
-                con = sqlite3.connect("coffee.sqlite")
+                con = sqlite3.connect("data/coffee.sqlite")
                 cur = con.cursor()
                 result = cur.execute(f"UPDATE coffee SET {tabl} = ? WHERE id = ?", (name, a[cofe]))
                 con.commit()
